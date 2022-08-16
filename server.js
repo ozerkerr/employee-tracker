@@ -25,10 +25,10 @@ const mainMenu = () => {
         viewAllEmployees();
         break;
       case "Add Department":
-        createIntern();
+        addDepartment();
         break;
       case "Add Role":
-        createIntern();
+        addRole();
         break;
       case "Add Employee":
         addEmployee();
@@ -79,6 +79,64 @@ const viewAllEmployees = () => {
     })
 }
 
+const addDepartment = () => {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'department',
+      message: "What is the name of department?",
+    }
+  ]).then(answer => {
+    console.log(answer)
+    connection.query("INSERT INTO department (name) VALUES (?)", answer.department, (err, result) => {
+      if(err) console.log(err);
+      console.log(`Added ${answer.department} to the database`);
+      viewAllDepartments();
+    })
+  })
+};
+
+const addRole = () => {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'newRole',
+      message: "What is the name of the role?",
+    },
+    {
+      type: 'input',
+      name: 'salary',
+      message: "What is the salary of the role?",
+    }
+  ]).then(answer => {
+    const newRole = [answer.newRole, answer.salary]
+
+    const getDepartments = "SELECT * FROM department";
+    connection.query(getDepartments, (err, data) => {
+      const listOfDepartments = data.map(({ id, name }) => ({ name: name, value: id }));
+
+      inquirer.prompt([
+        {
+          type: 'list',
+          name: 'departmentName',
+          message: "Which depatment does the role belong to?",
+          choices: listOfDepartments
+        }
+      ]).then(chosenDepartment => {
+        newRole.push(chosenDepartment.departmentName)
+
+        console.log(newRole)
+
+        connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", newRole, (err) => {
+          if(err) console.log(err)
+          console.log(`Added ${newRole[0]} to the database`);
+          viewAllRoles();
+        })
+      })
+    })
+  })
+}
+
 const addEmployee = () => {
   inquirer.prompt([
     {
@@ -120,8 +178,8 @@ const addEmployee = () => {
             newEmployee.push(chosenManager.manager)
             connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)
             VALUES (?, ?, ?, ?)`, newEmployee, (err) => {
-              if(err) console.log(err)
-              console.log("Employee has been added!")
+              if(err) console.log(err);
+              console.log(`Added ${newEmployee[0]} ${newEmployee[1]} to the database`);
               viewAllEmployees();
             })
           })
