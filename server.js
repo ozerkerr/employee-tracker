@@ -1,11 +1,7 @@
+const connection = require("./config/connection")
 const inquirer = require("inquirer");
-// const fs = require("fs");
-// const Manager = require("./lib/Manager");
-// const Engineer = require("./lib/Engineer");
-// const Intern = require("./lib/Intern");
-// const renderTeam = require("./src/html-templates")
-
-// const teamMemeberObjArr = [];
+const { error } = require("console");
+// import { viewAllDepartments } from './js/server'
 
 // create a function to get manager class
 const mainMenu = () => {
@@ -20,10 +16,11 @@ const mainMenu = () => {
   .then(answers => {
     switch (answers.choice){
       case "View All Departments":
+        // viewAllDepartments();
         viewAllDepartments();
         break;
       case "View All Roles":
-        createIntern();
+        viewAllRoles();
         break;
       case "View All Employees":
         createIntern();
@@ -46,8 +43,19 @@ const mainMenu = () => {
 };
 
 const viewAllDepartments = () => {
-  console.log('asdf')
+  connection.query("SELECT * FROM department;", function(err, results){
+    console.log(results, 'www')
+    if(err) throw err;
+    
+    mainMenu();
+  })
 }
+const viewAllRoles = () => {
+  db.query("SELECT * FROM role;", function(err, results){
+    console.log(results, 'qqq')
+    if(error) console.log(error)
+  })
+};
 
 
 // const buildTeam = () => {

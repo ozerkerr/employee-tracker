@@ -8,11 +8,14 @@
     "test": "tests"
   },
   "dependencies": {
+    "console.table": "^0.10.0",
     "email-validator": "^2.0.4",
+    "express": "^4.17.1",
     "inquirer": "^8.2.4",
-    "jest": "^28.1.3"
+    "jest": "^28.1.3",
+    "jshint": "^2.12.0",
+    "mysql2": "^2.2.5"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "jest"
   },
