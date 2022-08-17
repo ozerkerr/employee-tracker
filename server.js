@@ -34,7 +34,7 @@ const mainMenu = () => {
         addEmployee();
         break;
       default:
-        buildTeam();
+        updateEmployeeRole();
         break;
     }
     console.log(answers)
@@ -188,6 +188,69 @@ const addEmployee = () => {
     })
   })
 }
+
+const updateEmployeeRole = () => {
+  connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.id AS "role_id"
+    FROM employee, role, department WHERE department.id = role.department_id AND role.id = employee.role_id`, (err, res) => {
+    if (err) console.log(error);
+    let employeeNamesArray = [];
+    res.forEach((employee) => {employeeNamesArray.push(`${employee.first_name} ${employee.last_name}`);});
+
+    connection.query(`SELECT role.id, role.title FROM role`, (error, result) => {
+      if (err) console.log(error);
+      let rolesArray = [];
+      result.forEach((role) => {rolesArray.push(role.title);});
+
+      inquirer
+        .prompt([
+          {
+            name: 'chosenEmployee',
+            type: 'list',
+            message: 'Which employee has a new role?',
+            choices: employeeNamesArray
+          },
+          {
+            name: 'chosenRole',
+            type: 'list',
+            message: 'What is their new role?',
+            choices: rolesArray
+          }
+        ])
+        .then((answer) => {
+          let newTitleId, employeeId;
+
+          result.forEach((role) => {
+            if (answer.chosenRole === role.title) {
+              newTitleId = role.id;
+              console.log(newTitleId, 'newTitleId')
+            }
+          });
+
+          console.log(result, 'ffff')
+
+          res.forEach((employee) => {
+            if (
+              answer.chosenEmployee ===
+              `${employee.first_name} ${employee.last_name}`
+            ) {
+              employeeId = employee.id;
+              console.log(employeeId, 'employeeId')
+            }
+          });
+
+          connection.query(
+            `UPDATE employee SET employee.role_id = ? WHERE employee.id = ?`,
+            [newTitleId, employeeId],
+            (error) => {
+              if (error) throw error;
+              console.log(`Employee Role Updated`);
+              viewAllEmployees();
+            }
+          );
+        });
+    });
+  });
+};
 
 // initialize function
 const init = () => {
